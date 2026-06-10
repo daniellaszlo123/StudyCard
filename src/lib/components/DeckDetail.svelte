@@ -16,6 +16,28 @@
   // Find current deck reactively
   let deck = $derived(deckStore.decks.find(d => d.id === deckId));
 
+  // Deck Rename State
+  let isEditingName = $state(false);
+  let tempDeckName = $state('');
+
+  function startEditingName() {
+    if (!deck) return;
+    tempDeckName = deck.name;
+    isEditingName = true;
+  }
+
+  function handleRenameDeck(e: SubmitEvent) {
+    e.preventDefault();
+    if (!deck || !tempDeckName.trim()) return;
+
+    deckStore.updateDeck({
+      ...deck,
+      name: tempDeckName.trim()
+    });
+    isEditingName = false;
+    toastStore.show(i18n.t('save'), 'success');
+  }
+
   // Card Add/Edit Form State
   let isFormOpen = $state(false);
   let editingCardId = $state<string | null>(null);
@@ -107,7 +129,26 @@
     <!-- Header info and action trigger buttons -->
     <div class="detail-header" style="margin-top: 16px;">
       <div class="detail-title-section">
-        <h2 style="margin: 0; font-size: 26px;">{deck.name}</h2>
+        {#if isEditingName}
+          <form onsubmit={handleRenameDeck} style="display: flex; gap: 8px; align-items: center;">
+            <input 
+              type="text" 
+              class="form-input" 
+              style="font-size: 20px; padding: 4px 8px; max-width: 250px; font-family: inherit; font-weight: 600;" 
+              bind:value={tempDeckName} 
+              required 
+              autofocus
+            />
+            <button type="submit" class="btn btn-success btn-icon-only" style="width: 32px; height: 32px;">✔️</button>
+            <button type="button" class="btn btn-secondary btn-icon-only" style="width: 32px; height: 32px;" onclick={() => isEditingName = false}>❌</button>
+          </form>
+        {:else}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+          <h2 style="margin: 0; font-size: 26px; cursor: pointer; display: flex; align-items: center; gap: 8px;" onclick={startEditingName} title="Rename Deck">
+            {deck.name} <span style="font-size: 14px; opacity: 0.6; font-weight: normal;">✏️</span>
+          </h2>
+        {/if}
         <span class="counter" style="margin: 0;">{deck.cards.length} {i18n.t('cardsCount')}</span>
       </div>
       
