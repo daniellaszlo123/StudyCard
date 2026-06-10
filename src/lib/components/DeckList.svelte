@@ -27,6 +27,9 @@
     if (!target.files || target.files.length === 0) return;
     const file = target.files[0];
 
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    const isTxt = fileExt === 'txt';
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
@@ -34,6 +37,7 @@
       Papa.parse(text, {
         header: false,
         skipEmptyLines: true,
+        delimiter: isTxt ? ';' : '',
         complete: (results) => {
           const rows = results.data as string[][];
           if (rows.length === 0) {
@@ -140,7 +144,7 @@
       <p class="csv-info">{i18n.t('csvInstructions')}</p>
       <input 
         type="file" 
-        accept=".csv" 
+        accept=".csv,.txt" 
         bind:this={fileInput} 
         onchange={handleCsvUpload} 
       />

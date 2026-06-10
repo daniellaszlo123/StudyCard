@@ -6,9 +6,9 @@
   "createNewDeck": "Új pakli létrehozása",
   "deckNamePlaceholder": "Pakli neve...",
   "create": "Létrehozás",
-  "importCsv": "Pakli importálása CSV-ből",
+  "importCsv": "Pakli importálása CSV / TXT-ből",
   "importSuccess": "Pakli sikeresen importálva!",
-  "importError": "Nem sikerült feldolgozni a CSV fájlt.",
+  "importError": "Nem sikerült feldolgozni a CSV vagy TXT fájlt.",
   "cardsCount": "kártya",
   "deleteDeckConfirm": "Biztosan törölni szeretnéd a(z) \"{name}\" paklit?",
   "addCard": "Kártya hozzáadása",
@@ -42,5 +42,5 @@
   "needsPractice": "Gyakorolj még egy kicsit, sikerülni fog!",
   "restartExam": "Vizsga újraindítása",
   "exitExam": "Kilépés a vizsgából",
-  "csvInstructions": "CSV formátum: Első oszlop az előlap, második oszlop a hátlap. A fejléc automatikusan átugrásra kerül, ha 'front', 'back', 'question', 'answer' stb. nevű."
+  "csvInstructions": "CSV/TXT formátum: Vesszővel vagy pontosvesszővel elválasztott oszlopok. Első oszlop az előlap, második a hátlap. Fejlécek automatikusan átugrásra kerülnek."
 }

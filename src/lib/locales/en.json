@@ -6,9 +6,9 @@
   "createNewDeck": "Create New Deck",
   "deckNamePlaceholder": "Enter deck name...",
   "create": "Create",
-  "importCsv": "Import Deck from CSV",
+  "importCsv": "Import Deck from CSV / TXT",
   "importSuccess": "Deck successfully imported!",
-  "importError": "Failed to parse CSV file.",
+  "importError": "Failed to parse CSV or TXT file.",
   "cardsCount": "cards",
   "deleteDeckConfirm": "Are you sure you want to delete the deck \"{name}\"?",
   "addCard": "Add Card",
@@ -42,5 +42,5 @@
   "needsPractice": "Keep practicing, you will get there!",
   "restartExam": "Restart Exam",
   "exitExam": "Exit Exam",
-  "csvInstructions": "CSV format: First column for Front, second column for Back. Headers are auto-skipped if they match 'front', 'back', 'question', 'answer' etc."
+  "csvInstructions": "CSV/TXT format: Columns separated by comma or semicolon. First column for Front, second column for Back. Headers are auto-skipped if they match 'front', 'back' etc."
 }
