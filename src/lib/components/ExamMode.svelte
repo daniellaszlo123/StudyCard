@@ -2,6 +2,7 @@
   import { i18n } from '../i18n.svelte';
   import { deckStore } from '../storage.svelte';
   import type { Card } from '../types';
+  import { formatCardText } from '../utils';
 
   // Props
   let { deckId, onGoBack } = $props<{
@@ -122,7 +123,7 @@
           <!-- Front Side -->
           <div class="flashcard-face flashcard-front">
             <span class="card-badge">{i18n.t('frontPlaceholder')}</span>
-            <div class="card-content-text">{activeCard.front}</div>
+            <div class="card-content-text">{@html formatCardText(activeCard.front)}</div>
             <span style="position: absolute; bottom: 20px; font-size: 11px; color: var(--text-muted);">
               🔄 {i18n.t('showAnswer')}
             </span>
@@ -131,7 +132,7 @@
           <!-- Back Side -->
           <div class="flashcard-face flashcard-back">
             <span class="card-badge">{i18n.t('backPlaceholder')}</span>
-            <div class="card-content-text">{activeCard.back}</div>
+            <div class="card-content-text">{@html formatCardText(activeCard.back)}</div>
             <span style="position: absolute; bottom: 20px; font-size: 11px; color: var(--primary);">
               🔄 {i18n.t('showAnswer')}
             </span>
@@ -188,8 +189,8 @@
             <h3>⚠️ {i18n.t('wrongCardsHeader')}</h3>
             {#each incorrectCards as card (card.id)}
               <div class="wrong-card-item">
-                <span class="wrong-card-front">{card.front}</span>
-                <span class="wrong-card-back">➔ {card.back}</span>
+                <span class="wrong-card-front">{@html formatCardText(card.front)}</span>
+                <span class="wrong-card-back">➔ {@html formatCardText(card.back)}</span>
               </div>
             {/each}
           </div>

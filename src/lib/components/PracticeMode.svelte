@@ -3,6 +3,7 @@
   import { i18n } from '../i18n.svelte';
   import { deckStore } from '../storage.svelte';
   import { toastStore } from '../toast.svelte';
+  import { formatCardText } from '../utils';
 
   // Props
   let { deckId, onGoBack } = $props<{
@@ -94,7 +95,7 @@
         <!-- Front Side -->
         <div class="flashcard-face flashcard-front">
           <span class="card-badge">{i18n.t('frontPlaceholder')}</span>
-          <div class="card-content-text">{activeCard.front}</div>
+          <div class="card-content-text">{@html formatCardText(activeCard.front)}</div>
           <span style="position: absolute; bottom: 20px; font-size: 11px; color: var(--text-muted);">
             🔄 {i18n.t('showAnswer')} / Space
           </span>
@@ -103,7 +104,7 @@
         <!-- Back Side -->
         <div class="flashcard-face flashcard-back">
           <span class="card-badge">{i18n.t('backPlaceholder')}</span>
-          <div class="card-content-text">{activeCard.back}</div>
+          <div class="card-content-text">{@html formatCardText(activeCard.back)}</div>
           <span style="position: absolute; bottom: 20px; font-size: 11px; color: var(--primary);">
             🔄 {i18n.t('showAnswer')} / Space
           </span>

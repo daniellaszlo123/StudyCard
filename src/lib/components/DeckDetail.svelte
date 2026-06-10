@@ -3,6 +3,7 @@
   import { deckStore } from '../storage.svelte';
   import { toastStore } from '../toast.svelte';
   import type { Card } from '../types';
+  import { formatCardText } from '../utils';
 
   // Props
   let { deckId, onGoBack, onStartPractice, onStartExam } = $props<{
@@ -191,11 +192,11 @@
           <div class="card-item">
             <div>
               <div class="card-side-title">{i18n.t('frontPlaceholder')}</div>
-              <div class="card-text">{card.front}</div>
+              <div class="card-text">{@html formatCardText(card.front)}</div>
             </div>
             <div>
               <div class="card-side-title">{i18n.t('backPlaceholder')}</div>
-              <div class="card-text" style="color: var(--primary); font-weight: 500;">{card.back}</div>
+              <div class="card-text" style="color: var(--primary); font-weight: 500;">{@html formatCardText(card.back)}</div>
             </div>
             <div class="card-actions">
               <button 
