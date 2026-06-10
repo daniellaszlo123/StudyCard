@@ -95,8 +95,10 @@
         <!-- Front Side -->
         <div class="flashcard-face flashcard-front">
           <span class="card-badge">{i18n.t('frontPlaceholder')}</span>
-          <div class="card-content-text">{@html formatCardText(activeCard.front)}</div>
-          <span style="position: absolute; bottom: 20px; font-size: 11px; color: var(--text-muted);">
+          <div class="card-content-wrapper">
+            <div class="card-content-text">{@html formatCardText(activeCard.front)}</div>
+          </div>
+          <span class="card-flip-prompt">
             🔄 {i18n.t('showAnswer')} / Space
           </span>
         </div>
@@ -104,8 +106,10 @@
         <!-- Back Side -->
         <div class="flashcard-face flashcard-back">
           <span class="card-badge">{i18n.t('backPlaceholder')}</span>
-          <div class="card-content-text">{@html formatCardText(activeCard.back)}</div>
-          <span style="position: absolute; bottom: 20px; font-size: 11px; color: var(--primary);">
+          <div class="card-content-wrapper">
+            <div class="card-content-text">{@html formatCardText(activeCard.back)}</div>
+          </div>
+          <span class="card-flip-prompt">
             🔄 {i18n.t('showAnswer')} / Space
           </span>
         </div>

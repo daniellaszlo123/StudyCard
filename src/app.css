@@ -548,10 +548,16 @@ body {
 .flashcard-wrapper {
   perspective: 1000px;
   width: 100%;
-  max-width: 500px;
-  height: 300px;
+  max-width: 600px;
+  height: 380px;
   cursor: pointer;
   margin-bottom: 24px;
+}
+
+@media (max-width: 600px) {
+  .flashcard-wrapper {
+    height: 320px;
+  }
 }
 
 .flashcard-inner {
@@ -576,12 +582,11 @@ body {
   backface-visibility: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
+  padding: 0;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background-color: var(--bg-secondary);
+  overflow: hidden;
 }
 
 .flashcard-front {
@@ -596,8 +601,10 @@ body {
 
 .card-badge {
   position: absolute;
-  top: 20px;
-  font-size: 11px;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -605,12 +612,43 @@ body {
   background-color: var(--bg-tertiary);
   padding: 4px 10px;
   border-radius: var(--radius-full);
+  z-index: 10;
+}
+
+.card-flip-prompt {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  z-index: 10;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.flashcard-back .card-flip-prompt {
+  color: var(--primary);
+}
+
+.card-content-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 52px 24px 44px 24px;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-content-text {
-  font-size: 24px;
+  margin: auto;
+  width: 100%;
+  font-size: 18px;
+  line-height: 1.6;
   font-weight: 500;
   word-break: break-word;
+  text-align: center;
 }
 
 .practice-controls {
