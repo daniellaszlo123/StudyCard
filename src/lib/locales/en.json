@@ -42,5 +42,6 @@
   "needsPractice": "Keep practicing, you will get there!",
   "restartExam": "Restart Exam",
   "exitExam": "Exit Exam",
-  "csvInstructions": "CSV/TXT format: Columns separated by comma or semicolon. First column for Front, second column for Back. Headers are auto-skipped if they match 'front', 'back' etc."
+  "csvInstructions": "CSV/TXT format: Columns separated by comma or semicolon. First column for Front, second column for Back. Headers are auto-skipped if they match 'front', 'back' etc.",
+  "keyboardTip": "💡 Tip: Use Left/Right Arrow keys or A/D to browse, and Space or Enter key to flip the card."
 }

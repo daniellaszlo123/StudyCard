@@ -42,5 +42,6 @@
   "needsPractice": "Gyakorolj még egy kicsit, sikerülni fog!",
   "restartExam": "Vizsga újraindítása",
   "exitExam": "Kilépés a vizsgából",
-  "csvInstructions": "CSV/TXT formátum: Vesszővel vagy pontosvesszővel elválasztott oszlopok. Első oszlop az előlap, második a hátlap. Fejlécek automatikusan átugrásra kerülnek."
+  "csvInstructions": "CSV/TXT formátum: Vesszővel vagy pontosvesszővel elválasztott oszlopok. Első oszlop az előlap, második a hátlap. Fejlécek automatikusan átugrásra kerülnek.",
+  "keyboardTip": "💡 Tipp: Használd a Bal/Jobb Nyilakat vagy az A/D billentyűket a lapozáshoz, és a Szóközt vagy az Entert a kártya megfordításához."
 }

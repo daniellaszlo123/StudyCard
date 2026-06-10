@@ -141,7 +141,7 @@
 
     <!-- Helpful Tip -->
     <p style="font-size: 12px; color: var(--text-muted); margin-top: 32px; text-align: center; max-width: 350px;">
-      💡 Tip: Use Left/Right Arrow keys or A/D to browse, and Space or Enter key to flip the card.
+      {i18n.t('keyboardTip')}
     </p>
   </div>
 {/if}
