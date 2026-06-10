@@ -19,6 +19,9 @@
     "vite": "^8.0.12"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
     "@types/papaparse": "^5.5.2",
     "papaparse": "^5.5.3"
   }

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">StudyCard</string>
+    <string name="title_activity_main">StudyCard</string>
+    <string name="package_name">com.daniellaszlo.studycard</string>
+    <string name="custom_url_scheme">com.daniellaszlo.studycard</string>
+</resources>
