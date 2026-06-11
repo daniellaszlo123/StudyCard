@@ -11,7 +11,14 @@ export interface Deck {
   createdAt: number;
 }
 
-export type AppView = 'deck-list' | 'deck-detail' | 'practice' | 'exam';
+export type AppView = 
+  | 'deck-list' 
+  | 'deck-detail' 
+  | 'practice' 
+  | 'exam'
+  | 'bank-list'
+  | 'bank-detail'
+  | 'bank-exam';
 
 export interface ExamSession {
   deckId: string;
@@ -21,3 +28,25 @@ export interface ExamSession {
   answers: Record<string, boolean>; // card.id -> true (correct) or false (incorrect)
   isFinished: boolean;
 }
+
+export interface Question {
+  id: string;
+  question: string;
+  choices: string[];
+  correctAnswer: string;
+}
+
+export interface QuestionBank {
+  id: string;
+  name: string;
+  questions: Question[];
+  createdAt: number;
+}
+
+export interface QuestionStats {
+  correctCount: number;
+  wrongCount: number;
+}
+
+export type QuestionBankStats = Record<string, QuestionStats>;
+
