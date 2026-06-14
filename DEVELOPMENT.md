@@ -10,6 +10,7 @@ This document serves as a comprehensive developer guide for **StudyCard**, a mod
 - **Tooling & Bundler:** [Vite](https://vite.dev/) + TypeScript (strict compilation).
 - **Styling:** Premium Vanilla CSS (located in `src/app.css`) featuring custom CSS variables, responsive mobile adaptations, 3D card flips, and custom scrollbars.
 - **CSV/TXT Parser:** [PapaParse](https://www.papaparse.com/) for CSV parsing.
+- **Desktop Wrapper:** [Tauri v2](https://tauri.app/) for native Windows packaging and desktop installer generation.
 - **Mobile Wrapper:** [Capacitor](https://capacitorjs.com/) for native Android packaging.
 - **Persistence:** Synchronous `localStorage` serialization.
 
@@ -74,6 +75,8 @@ The application parses CSV and TXT files for both Decks and Question Banks:
   2. Column 2: Possible Options (choices separated by `|`, `;` or `,` in order of preference)
   3. Column 3: Correct Answer
 - **Header Skippers:** Columns starting with keywords like *front*, *back*, *question*, *choices*, *answer*, *correct* are recognized as metadata headers and are automatically skipped.
+- **Quote Characters:** Quote parsing is disabled (`quoteChar: ''`) in `Papa.parse` to prevent unescaped quotes (e.g., HTML tags or conversational double quotes inside text fields) from merging lines and causing truncation or parsing errors.
+- **Empty Field/Consecutive Delimiter Handling:** Parsed rows are filtered to remove any empty elements (via `row.map(s => s?.trim()).filter(Boolean)`) before column length verification. This ensures that consecutive delimiters (e.g., double semicolons `;;`) and trailing delimiters do not introduce empty fields that would cause questions or cards to be skipped. The parser retrieves the final column as the correct answer (or card back) from the last index of the filtered array.
 
 ### 3. Safe Card Text Layout Formatting
 To render HTML formatting like line breaks safely, we filter all raw text using `formatCardText` from `utils.ts`:
@@ -129,14 +132,66 @@ Whenever you edit code in the Svelte project and want to test on Android:
     ```
 
 ### Compiling to APK
+
+#### Method A: Command-Line (Fastest)
+You can build the APK directly from your terminal. Since modern Android builds are sensitive to Java version mismatches (e.g. JDK 26 may fail), it is recommended to use Android Studio's bundled JDK 21.
+
+1.  **Build and sync your web assets:**
+    ```powershell
+    npm run build
+    npx cap sync
+    ```
+2.  **Compile the APK via Gradle Wrapper:**
+    On Windows (PowerShell):
+    ```powershell
+    $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+    cd android
+    .\gradlew.bat assembleDebug
+    cd ..
+    ```
+3.  **Retrieve the compiled APK at:**
+    `android/app/build/outputs/apk/debug/app-debug.apk`
+
+#### Method B: Android Studio GUI
 1.  **Open Android Studio:**
     ```powershell
     npx cap open android
     ```
 2.  **Let Android Studio sync Gradle.**
 3.  Go to **Build** > **Build Bundle(s) / APK(s)** > **Build APK(s)**.
-4.  Retreive the compiled file at:
+4.  Retrieve the compiled file at:
     `android/app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+## 🖥️ Desktop Workflow (Tauri)
+
+Tauri wraps the web application in a native lightweight desktop frame using a Rust backend.
+
+### Configure Bundle Identifier
+In `src-tauri/tauri.conf.json`, you must customize the `identifier` property:
+```json
+"identifier": "com.studycard.app"
+```
+*(Using the default `com.tauri.dev` identifier is disallowed by Tauri during the release build.)*
+
+### Build Desktop Installers
+To build the production app and package standalone Windows installers:
+```powershell
+npx tauri build
+```
+This script runs the Svelte production build and utilizes Cargo and WiX/NSIS toolchains to output the final installer packages at:
+- **NSIS Setup:** `src-tauri/target/release/bundle/nsis/StudyCard_0.1.0_x64-setup.exe`
+- **MSI Installer:** `src-tauri/target/release/bundle/msi/StudyCard_0.1.0_x64_en-US.msi`
+
+> [!IMPORTANT]
+> **Dependency Troubleshooting (`alloc-no-stdlib` conflict)**
+> If the Cargo build fails compiling the `brotli` crate with duplicate/conflicting `alloc-no-stdlib` errors (v2.0.4 vs v3.0.0), this is due to `brotli-decompressor` auto-updating to a version requiring `alloc-no-stdlib` v3 while `brotli` itself remains compiled against v2.
+>
+> To resolve this conflict, downgrade/lock the `brotli-decompressor` version inside the `src-tauri` directory's `Cargo.lock` by running:
+> ```powershell
+> cargo update -p brotli-decompressor --precise 5.0.0
+> ```
 
 ---
 
@@ -144,9 +199,7 @@ Whenever you edit code in the Svelte project and want to test on Android:
 
 Future developers might want to target these areas for improvements:
 
-1.  **Windows Desktop packaging (Tauri v2):**
-    Install Rust and Visual Studio Build tools, run `npm install @tauri-apps/cli` and `npx tauri init` to bundle the app as a lightweight standalone Windows `.exe` installer.
-2.  **Spaced Repetition System (SRS):**
+1.  **Spaced Repetition System (SRS):**
     Expand the `Card` interface in `types.ts` to include review intervals, ease factor, and next review timestamps (e.g. SuperMemo-2 algorithm) for smarter practice prompts.
-3.  **Supabase / Remote sync:**
+2.  **Supabase / Remote sync:**
     Configure a cloud database to synchronize decks across Windows and Android systems dynamically under a user profile account.

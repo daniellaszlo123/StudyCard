@@ -38,6 +38,7 @@
         header: false,
         skipEmptyLines: true,
         delimiter: isTxt ? ';' : '',
+        quoteChar: '',
         complete: (results) => {
           const rows = results.data as string[][];
           if (rows.length === 0) {
@@ -62,9 +63,10 @@
           const cards = [];
           for (let i = startIndex; i < rows.length; i++) {
             const row = rows[i];
-            if (row.length >= 2) {
-              const front = row[0]?.trim();
-              const back = row[1]?.trim();
+            const cleanRow = row.map(cell => cell?.trim()).filter(Boolean);
+            if (cleanRow.length >= 2) {
+              const front = cleanRow[0];
+              const back = cleanRow[cleanRow.length - 1];
               if (front && back) {
                 cards.push({
                   id: 'card-' + Math.random().toString(36).substring(2, 9) + '-' + i,

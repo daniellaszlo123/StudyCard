@@ -38,6 +38,7 @@
         header: false,
         skipEmptyLines: true,
         delimiter: isTxt ? ';' : '',
+        quoteChar: '',
         complete: (results) => {
           const rows = results.data as string[][];
           if (rows.length === 0) {
@@ -64,10 +65,11 @@
           const questions = [];
           for (let i = startIndex; i < rows.length; i++) {
             const row = rows[i];
-            if (row.length >= 3) {
-              const questionText = row[0]?.trim();
-              const choicesRaw = row[1]?.trim();
-              const correctAnswer = row[2]?.trim();
+            const cleanRow = row.map(cell => cell?.trim()).filter(Boolean);
+            if (cleanRow.length >= 3) {
+              const questionText = cleanRow[0];
+              const choicesRaw = cleanRow[1];
+              const correctAnswer = cleanRow[cleanRow.length - 1];
 
               if (questionText && choicesRaw && correctAnswer) {
                 // Parse choices: split by '|', ';', or ','
