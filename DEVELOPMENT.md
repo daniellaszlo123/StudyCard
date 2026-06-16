@@ -115,7 +115,7 @@ These are loaded dynamically in [config.ts](file:///c:/Users/lolga/Documents/Stu
 
 ### 2. Username & Password Auth
 End-users log in or register using a **Username** and **Password** (no emails are requested). Usernames are case-insensitively unique:
-- The username is mapped to a local email format: `username.toLowerCase() + "@studycard.local"`.
+- The username is mapped to a local email format: `username.toLowerCase() + "@studycard.com"`.
 - This handles case-insensitivity mapping (e.g. `User` and `user` resolve to the exact same database account name) and satisfies standard Supabase email requirements.
 - The email confirmation requirement must be disabled on the Supabase project dashboard (Settings -> Auth -> Email Auth -> Confirm email = false).
 

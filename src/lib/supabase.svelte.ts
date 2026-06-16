@@ -36,9 +36,9 @@ if (supabase) {
   loadingState = false;
 }
 
-// Convert username to studycard.local email
+// Convert username to studycard.com email
 function toEmail(username: string): string {
-  return username.trim().toLowerCase() + "@studycard.local";
+  return username.trim().toLowerCase() + "@studycard.com";
 }
 
 // Extract username from email
