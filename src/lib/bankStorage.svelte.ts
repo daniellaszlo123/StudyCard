@@ -95,10 +95,13 @@ function loadBanks(): QuestionBank[] {
   }
 }
 
+let changeListener: (() => void) | null = null;
+
 function saveBanks(data: QuestionBank[]) {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
+  if (changeListener) changeListener();
 }
 
 function loadStats(): QuestionBankStats {
@@ -117,6 +120,7 @@ function saveStats(data: QuestionBankStats) {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem(STATS_KEY, JSON.stringify(data));
   }
+  if (changeListener) changeListener();
 }
 
 // Svelte 5 reactive states
@@ -188,5 +192,27 @@ export const bankStore = {
 
   getQuestionStats(questionId: string): QuestionStats {
     return statsState[questionId] || { correctCount: 0, wrongCount: 0 };
+  },
+
+  onStoreChange(listener: () => void) {
+    changeListener = listener;
+  },
+
+  setBanksAndStats(newBanks: QuestionBank[], newStats: QuestionBankStats) {
+    banksState = newBanks;
+    statsState = newStats;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(banksState));
+      localStorage.setItem(STATS_KEY, JSON.stringify(statsState));
+    }
+  },
+
+  resetBanks() {
+    banksState = [...DEFAULT_BANKS];
+    statsState = {};
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(banksState));
+      localStorage.setItem(STATS_KEY, JSON.stringify(statsState));
+    }
   }
 };

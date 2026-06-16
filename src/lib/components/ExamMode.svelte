@@ -166,6 +166,16 @@
         <h2 class="results-header">🎓 {i18n.t('examResults')}</h2>
         <p style="color: var(--text-secondary);">{deck.name}</p>
 
+        <!-- Action buttons at the top -->
+        <div style="margin-top: 16px; margin-bottom: 24px; display: flex; gap: 16px; justify-content: center;">
+          <button class="btn btn-secondary" onclick={handleExitExam}>
+            🚪 {i18n.t('exitExam')}
+          </button>
+          <button class="btn btn-primary" onclick={startExam}>
+            🔄 {i18n.t('restartExam')}
+          </button>
+        </div>
+
         <!-- Score Ring -->
         <div class="results-score-circle" class:perfect={percentage === 100}>
           <span class="score-pct">{percentage}%</span>

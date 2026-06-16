@@ -9,7 +9,7 @@
   let { bankId, onGoBack, onStartExam } = $props<{
     bankId: string;
     onGoBack: () => void;
-    onStartExam: (count: number, mode: 'random' | 'difficult') => void;
+    onStartExam: (count: number, mode: 'random' | 'difficult', shuffleAnswers: boolean) => void;
   }>();
 
   // Find current bank reactively
@@ -151,6 +151,7 @@
   // Exam Setup Options
   let examSize = $state(bank ? Math.min(10, bank.questions.length) : 5);
   let examMode = $state<'random' | 'difficult'>('random');
+  let shuffleAnswers = $state(false);
 
   // Clamp exam size dynamically if questions length changes
   $effect(() => {
@@ -169,7 +170,7 @@
   });
 
   function startQuiz() {
-    onStartExam(examSize, examMode);
+    onStartExam(examSize, examMode, shuffleAnswers);
   }
 </script>
 
@@ -263,6 +264,17 @@
                 {i18n.t('modeDifficult')} {!hasDifficultQuestions() ? '🔒' : ''}
               </option>
             </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0; padding-bottom: 10px;">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+              <input
+                type="checkbox"
+                bind:checked={shuffleAnswers}
+                style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);"
+              />
+              <span>{i18n.t('shuffleAnswers')}</span>
+            </label>
           </div>
 
           <div>

@@ -9,11 +9,14 @@
   import BankList from './lib/components/BankList.svelte';
   import BankDetail from './lib/components/BankDetail.svelte';
   import BankExam from './lib/components/BankExam.svelte';
+  import { supabaseService } from './lib/supabase.svelte';
+  import AuthModal from './lib/components/AuthModal.svelte';
 
   let currentView = $state<AppView>('deck-list');
   let selectedDeckId = $state<string | null>(null);
+  let isAuthModalOpen = $state(false);
   let selectedBankId = $state<string | null>(null);
-  let bankExamConfig = $state<{ count: number, mode: 'random' | 'difficult' } | null>(null);
+  let bankExamConfig = $state<{ count: number, mode: 'random' | 'difficult', shuffleAnswers: boolean } | null>(null);
 
   function navigateTo(view: AppView, targetId: string | null = null) {
     currentView = view;
@@ -72,7 +75,7 @@
       </button>
     </div>
 
-    <div class="header-controls">
+    <div class="header-controls" style="display: flex; gap: 8px; align-items: center;">
       <div class="lang-switch">
         <button 
           class="lang-btn" 
@@ -89,6 +92,18 @@
           HU
         </button>
       </div>
+
+      <button 
+        class="btn btn-secondary btn-icon-only" 
+        style="width: 38px; height: 38px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; position: relative;"
+        onclick={() => isAuthModalOpen = true}
+        title={i18n.t('account')}
+      >
+        👤
+        {#if supabaseService.user && supabaseService.isConfigured}
+          <span style="position: absolute; bottom: 2px; right: 2px; width: 8px; height: 8px; border-radius: 50%; background-color: var(--success); border: 1.5px solid var(--bg-secondary);"></span>
+        {/if}
+      </button>
     </div>
   </header>
 
@@ -112,8 +127,8 @@
       <BankDetail 
         bankId={selectedBankId} 
         onGoBack={handleGoBack} 
-        onStartExam={(count, mode) => {
-          bankExamConfig = { count, mode };
+        onStartExam={(count, mode, shuffleAnswers) => {
+          bankExamConfig = { count, mode, shuffleAnswers };
           navigateTo('bank-exam');
         }}
       />
@@ -122,6 +137,7 @@
         bankId={selectedBankId} 
         count={bankExamConfig.count} 
         mode={bankExamConfig.mode} 
+        shuffleAnswers={bankExamConfig.shuffleAnswers}
         onGoBack={handleGoBack} 
       />
     {/if}
@@ -134,6 +150,8 @@
       {toastStore.message}
     </div>
   {/if}
+
+  <AuthModal isOpen={isAuthModalOpen} onClose={() => isAuthModalOpen = false} />
 </div>
 
 <style>

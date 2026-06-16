@@ -49,10 +49,13 @@ function loadDecks(): Deck[] {
   }
 }
 
+let changeListener: (() => void) | null = null;
+
 function saveDecks(data: Deck[]) {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
+  if (changeListener) changeListener();
 }
 
 // Svelte 5 reactive decks store
@@ -101,5 +104,19 @@ export const deckStore = {
       decksState[index] = { ...deck, cards: shuffledCards };
       saveDecks(decksState);
     }
+  },
+
+  onStoreChange(listener: () => void) {
+    changeListener = listener;
+  },
+
+  setDecks(newDecks: Deck[]) {
+    decksState = newDecks;
+    saveDecks(decksState);
+  },
+
+  resetDecks() {
+    decksState = [...DEFAULT_DECKS];
+    saveDecks(decksState);
   }
 };

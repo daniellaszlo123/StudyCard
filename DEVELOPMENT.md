@@ -96,7 +96,55 @@ In `BankExam.svelte`, the user can configure a multiple-choice session.
   $$\text{Difficulty Score} = \frac{\text{wrongCount}}{\text{correctCount} + \text{wrongCount}}$$
 - **Difficult Exam Selection:** In "Focus on Difficult Questions" mode, questions that have been answered incorrectly at least once (`wrongCount > 0`) are sorted descending by difficulty score and total wrong count.
 - **Adaptive Backfilling:** If the bank contains fewer than $N$ questions with recorded mistakes, the exam is backfilled to the requested count of $N$ using remaining randomized questions from the bank.
-- **Visual Feedback:** Options change colors instantly upon clicking (green for correct, red for incorrect along with highlighting the correct one), accompanied by a slide-by-slide progress counter and a full review list of mistakes at the end of the session.
+- **Visual Feedback:** Options change colors instantly upon clicking (green for correct, red for incorrect along with highlighting the correct one), accompanied by a slide-by-slide progress counter and a full review list of mistakes at the end of the session. To improve usability in long exams, action buttons (Exit Exam, Restart Exam) are duplicated at both the top and bottom of the results screen.
+- **Shuffle Possible Answers:** Users can toggle "Shuffle answer options" during exam setup. When enabled, the possible answers (choices) for each question are randomized per exam session. This is handled by cloning the question objects and shuffling their `choices` arrays dynamically in the exam player component, ensuring the original database/store records in `localStorage` remain intact and correctness comparison (which matches option strings) works seamlessly.
+
+---
+
+## ☁️ Cloud Sync and User Accounts
+
+To support cross-platform synchronization of card decks, question banks, and progress stats without a complex backend, StudyCard integrates with a free Supabase instance.
+
+### 1. Connection Credentials Setup
+Developer can configure connection keys inside the [.env](file:///c:/Users/lolga/Documents/StudyCard/.env) file:
+```env
+VITE_SUPABASE_URL="https://your-project.supabase.co"
+VITE_SUPABASE_ANON_KEY="your-anon-key"
+```
+These are loaded dynamically in [config.ts](file:///c:/Users/lolga/Documents/StudyCard/src/lib/config.ts). If left blank, the application degrades gracefully to local-only mode, disabling the cloud account UI modal actions.
+
+### 2. Username & Password Auth
+End-users log in or register using a **Username** and **Password** (no emails are requested). Usernames are case-insensitively unique:
+- The username is mapped to a local email format: `username.toLowerCase() + "@studycard.local"`.
+- This handles case-insensitivity mapping (e.g. `User` and `user` resolve to the exact same database account name) and satisfies standard Supabase email requirements.
+- The email confirmation requirement must be disabled on the Supabase project dashboard (Settings -> Auth -> Email Auth -> Confirm email = false).
+
+### 3. Database Table Schema
+Run the following SQL snippet in the Supabase Dashboard SQL Editor to set up the data table and Row Level Security:
+
+```sql
+create table if not exists studycard_sync (
+  user_id uuid references auth.users not null primary key,
+  decks jsonb default '[]'::jsonb,
+  banks jsonb default '[]'::jsonb,
+  stats jsonb default '{}'::jsonb,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS
+alter table studycard_sync enable row level security;
+
+-- Create policy for users to manage their own data row
+create policy "Users can manage their own data"
+  on studycard_sync for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+```
+
+### 4. Sync Operations
+- **Merge**: Automatically triggered upon successful login. Combines remote cloud card decks, question banks, and progress records with any local data. The combined set is then updated in local storage and pushed back to the cloud database.
+- **Auto-Sync**: If active, local modifications (adding/editing cards, question attempts) automatically update the cloud record in the background.
+- **Log Out**: Resets local state to generic default cards to ensure user privacy.
 
 ---
 
@@ -201,5 +249,4 @@ Future developers might want to target these areas for improvements:
 
 1.  **Spaced Repetition System (SRS):**
     Expand the `Card` interface in `types.ts` to include review intervals, ease factor, and next review timestamps (e.g. SuperMemo-2 algorithm) for smarter practice prompts.
-2.  **Supabase / Remote sync:**
-    Configure a cloud database to synchronize decks across Windows and Android systems dynamically under a user profile account.
+

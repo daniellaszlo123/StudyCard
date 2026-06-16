@@ -5,10 +5,11 @@
   import { formatCardText } from '../utils';
 
   // Props
-  let { bankId, count, mode, onGoBack } = $props<{
+  let { bankId, count, mode, shuffleAnswers, onGoBack } = $props<{
     bankId: string;
     count: number;
     mode: 'random' | 'difficult';
+    shuffleAnswers: boolean;
     onGoBack: () => void;
   }>();
 
@@ -34,6 +35,7 @@
     if (!bank) return;
 
     const limit = Math.max(1, Math.min(count, bank.questions.length));
+    let chosenQuestions: Question[] = [];
 
     if (mode === 'difficult') {
       // Get all questions mapped with stats
@@ -74,7 +76,7 @@
         selected.push(...shuffledRemaining.slice(0, needed));
       }
 
-      examQuestions = selected;
+      chosenQuestions = selected;
     } else {
       // Standard random exam mode: Shuffle all questions
       const shuffled = [...bank.questions];
@@ -82,8 +84,23 @@
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
-      examQuestions = shuffled.slice(0, limit);
+      chosenQuestions = shuffled.slice(0, limit);
     }
+
+    // Clone questions and optionally shuffle their choices to avoid mutating the bank state
+    examQuestions = chosenQuestions.map(q => {
+      const choices = [...q.choices];
+      if (shuffleAnswers) {
+        for (let i = choices.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [choices[i], choices[j]] = [choices[j], choices[i]];
+        }
+      }
+      return {
+        ...q,
+        choices
+      };
+    });
 
     currentIndex = 0;
     selectedChoice = null;
@@ -195,6 +212,16 @@
       <div class="results-card" style="max-width: 600px;">
         <h2 class="results-header">🎓 {i18n.t('examResults')}</h2>
         <p style="color: var(--text-secondary);">{bank.name}</p>
+
+        <!-- Action buttons at the top -->
+        <div style="margin-top: 16px; margin-bottom: 24px; display: flex; gap: 16px; justify-content: center;">
+          <button class="btn btn-secondary" onclick={handleExitExam}>
+            🚪 {i18n.t('exitExam')}
+          </button>
+          <button class="btn btn-primary" onclick={startExam}>
+            🔄 {i18n.t('restartExam')}
+          </button>
+        </div>
 
         <!-- Score Circle -->
         <div class="results-score-circle" class:perfect={percentage === 100}>
