@@ -141,16 +141,6 @@
             >
               🔄 {i18n.t('syncNow')}
             </button>
-
-            <!-- Auto Sync Toggle -->
-            <label class="auto-sync-toggle">
-              <input 
-                type="checkbox" 
-                bind:checked={supabaseService.autoSync} 
-                style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);"
-              />
-              <span>{i18n.t('autoSync')}</span>
-            </label>
           </div>
 
           <!-- Advanced Manual Overrides -->
@@ -395,16 +385,7 @@
     padding: 14px;
   }
 
-  .auto-sync-toggle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    user-select: none;
-  }
+
 
   .advanced-overrides {
     border: 1px solid var(--border-color);

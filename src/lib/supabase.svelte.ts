@@ -12,7 +12,7 @@ export const supabase = isConfigured ? createClient(SUPABASE_URL, SUPABASE_ANON_
 let userState = $state<any>(null);
 let loadingState = $state<boolean>(true);
 let syncLoadingState = $state<boolean>(false);
-let autoSyncState = $state<boolean>(localStorage.getItem('studycard_autosync') !== 'false');
+let autoSyncState = $state<boolean>(true);
 let lastSyncedState = $state<string>(localStorage.getItem('studycard_lastsynced') || '');
 
 if (supabase) {
@@ -83,12 +83,11 @@ export const supabaseService = {
   },
 
   get autoSync() {
-    return autoSyncState;
+    return true;
   },
 
   set autoSync(value: boolean) {
-    autoSyncState = value;
-    localStorage.setItem('studycard_autosync', String(value));
+    // Sync is always automatic and cannot be disabled
   },
 
   get lastSynced() {
@@ -213,91 +212,47 @@ async function syncMerge(silent = false) {
     return;
   }
 
-  const remoteDecks = (data?.decks || []) as any[];
-  const remoteBanks = (data?.banks || []) as any[];
-  const remoteStats = (data?.stats || {}) as Record<string, any>;
+  let finalDecks: any[] = [];
+  let finalBanks: any[] = [];
+  let finalStats: Record<string, any> = {};
 
-  // Merge Decks
-  const mergedDecks = [...deckStore.decks];
-  for (const rd of remoteDecks) {
-    const localIndex = mergedDecks.findIndex(ld => ld.id === rd.id);
-    if (localIndex === -1) {
-      mergedDecks.push(rd);
-    } else {
-      const ld = mergedDecks[localIndex];
-      const mergedCards = [...ld.cards];
-      for (const rc of rd.cards) {
-        const lcIndex = mergedCards.findIndex(lc => lc.id === rc.id);
-        if (lcIndex === -1) {
-          mergedCards.push(rc);
-        }
-      }
-      mergedDecks[localIndex] = {
-        ...ld,
-        cards: mergedCards
-      };
+  if (error && error.code === 'PGRST116') {
+    // New user, no cloud data. Initialize to empty arrays to separate from guest defaults.
+    finalDecks = [];
+    finalBanks = [];
+    finalStats = {};
+    
+    // Create sync row in DB
+    const { error: initError } = await supabase
+      .from('studycard_sync')
+      .upsert({
+        user_id: userState.id,
+        decks: finalDecks,
+        banks: finalBanks,
+        stats: finalStats,
+        updated_at: new Date().toISOString()
+      });
+      
+    if (initError && !silent) {
+      toastStore.show(i18n.t('syncFailed') + ': ' + initError.message, 'error');
     }
-  }
-
-  // Merge Banks
-  const mergedBanks = [...bankStore.banks];
-  for (const rb of remoteBanks) {
-    const localIndex = mergedBanks.findIndex(lb => lb.id === rb.id);
-    if (localIndex === -1) {
-      mergedBanks.push(rb);
-    } else {
-      const lb = mergedBanks[localIndex];
-      const mergedQuestions = [...lb.questions];
-      for (const rq of rb.questions) {
-        const lqIndex = mergedQuestions.findIndex(lq => lq.id === rq.id);
-        if (lqIndex === -1) {
-          mergedQuestions.push(rq);
-        }
-      }
-      mergedBanks[localIndex] = {
-        ...lb,
-        questions: mergedQuestions
-      };
-    }
-  }
-
-  // Merge Stats
-  const mergedStats = { ...bankStore.stats };
-  for (const [qId, rStat] of Object.entries(remoteStats)) {
-    const lStat = mergedStats[qId];
-    if (!lStat) {
-      mergedStats[qId] = rStat;
-    } else {
-      mergedStats[qId] = {
-        correctCount: Math.max(lStat.correctCount, rStat.correctCount),
-        wrongCount: Math.max(lStat.wrongCount, rStat.wrongCount)
-      };
-    }
+  } else if (data) {
+    // Existing user. Pull cloud data (overwriting local storage/stores)
+    finalDecks = data.decks || [];
+    finalBanks = data.banks || [];
+    finalStats = data.stats || {};
   }
 
   // Update local stores
-  deckStore.setDecks(mergedDecks);
-  bankStore.setBanksAndStats(mergedBanks, mergedStats);
+  deckStore.setDecks(finalDecks);
+  bankStore.setBanksAndStats(finalBanks, finalStats);
 
-  // Upload merged copy to the database
-  const { error: uploadError } = await supabase
-    .from('studycard_sync')
-    .upsert({
-      user_id: userState.id,
-      decks: mergedDecks,
-      banks: mergedBanks,
-      stats: mergedStats,
-      updated_at: new Date().toISOString()
-    });
+  // Set last synced timestamp
+  lastSyncedState = new Date().toLocaleString();
+  localStorage.setItem('studycard_lastsynced', lastSyncedState);
 
   if (!silent) {
     syncLoadingState = false;
-    if (uploadError) {
-      toastStore.show(i18n.t('syncFailed') + ': ' + uploadError.message, 'error');
-    } else {
-      lastSyncedState = new Date().toLocaleString();
-      localStorage.setItem('studycard_lastsynced', lastSyncedState);
-      toastStore.show(i18n.t('syncSuccess'), 'success');
-    }
+    toastStore.show(i18n.t('syncSuccess'), 'success');
   }
 }

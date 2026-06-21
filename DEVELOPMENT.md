@@ -142,9 +142,9 @@ create policy "Users can manage their own data"
 ```
 
 ### 4. Sync Operations
-- **Merge**: Automatically triggered upon successful login. Combines remote cloud card decks, question banks, and progress records with any local data. The combined set is then updated in local storage and pushed back to the cloud database.
-- **Auto-Sync**: If active, local modifications (adding/editing cards, question attempts) automatically update the cloud record in the background.
-- **Log Out**: Resets local state to generic default cards to ensure user privacy.
+- **Clean Sync**: Automatically triggered upon successful login. Instead of merging default dummy decks into the user's account, it pulls the user's remote cloud card decks, question banks, and progress records directly, completely overwriting local storage. If no cloud data exists (e.g. for a new user), it initializes the cloud storage and local workspace with empty arrays. This ensures strict isolation between accounts and local defaults.
+- **Auto-Sync**: Always active. Local modifications (adding/editing cards, question attempts, statistics updates) automatically trigger an upsert of the local state to the cloud database in the background.
+- **Log Out**: Resets local state to generic default cards and question banks to ensure user privacy and guest usability, with zero personal data persistent.
 
 ---
 
