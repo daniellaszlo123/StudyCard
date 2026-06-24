@@ -1,7 +1,7 @@
 <script lang="ts">
   import { i18n } from './lib/i18n.svelte';
   import { toastStore } from './lib/toast.svelte';
-  import type { AppView } from './lib/types';
+  import type { AppView, BankExamMode } from './lib/types';
   import DeckList from './lib/components/DeckList.svelte';
   import DeckDetail from './lib/components/DeckDetail.svelte';
   import PracticeMode from './lib/components/PracticeMode.svelte';
@@ -16,7 +16,7 @@
   let selectedDeckId = $state<string | null>(null);
   let isAuthModalOpen = $state(false);
   let selectedBankId = $state<string | null>(null);
-  let bankExamConfig = $state<{ count: number, mode: 'random' | 'difficult', shuffleAnswers: boolean } | null>(null);
+  let bankExamConfig = $state<{ count: number, mode: BankExamMode, shuffleAnswers: boolean } | null>(null);
 
   function navigateTo(view: AppView, targetId: string | null = null) {
     currentView = view;

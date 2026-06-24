@@ -65,6 +65,7 @@
   "difficultyMode": "Vizsga módja",
   "modeRandom": "Véletlenszerű kérdések",
   "modeDifficult": "Fókuszálás a nehéz kérdésekre",
+  "modeLeastSolved": "Fókuszálás a legkevesebbszer megoldott kérdésekre",
   "statsLabel": "Pontosság: {pct}% ({correct}/{attempts})",
   "noStats": "Még nincs próbálkozás",
   "examScore": "Vizsgaeredmény",

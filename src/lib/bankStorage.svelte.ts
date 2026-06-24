@@ -96,9 +96,10 @@ function loadBanks(): QuestionBank[] {
 }
 
 let changeListener: (() => void) | null = null;
+let isCloudState = $state(false);
 
 function saveBanks(data: QuestionBank[]) {
-  if (typeof localStorage !== 'undefined') {
+  if (typeof localStorage !== 'undefined' && !isCloudState) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
   if (changeListener) changeListener();
@@ -117,7 +118,7 @@ function loadStats(): QuestionBankStats {
 }
 
 function saveStats(data: QuestionBankStats) {
-  if (typeof localStorage !== 'undefined') {
+  if (typeof localStorage !== 'undefined' && !isCloudState) {
     localStorage.setItem(STATS_KEY, JSON.stringify(data));
   }
   if (changeListener) changeListener();
@@ -128,6 +129,13 @@ let banksState = $state<QuestionBank[]>(loadBanks());
 let statsState = $state<QuestionBankStats>(loadStats());
 
 export const bankStore = {
+  get isCloud() {
+    return isCloudState;
+  },
+  set isCloud(value: boolean) {
+    isCloudState = value;
+  },
+
   get banks() {
     return banksState;
   },
@@ -201,7 +209,7 @@ export const bankStore = {
   setBanksAndStats(newBanks: QuestionBank[], newStats: QuestionBankStats) {
     banksState = newBanks;
     statsState = newStats;
-    if (typeof localStorage !== 'undefined') {
+    if (typeof localStorage !== 'undefined' && !isCloudState) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(banksState));
       localStorage.setItem(STATS_KEY, JSON.stringify(statsState));
     }
@@ -210,7 +218,7 @@ export const bankStore = {
   resetBanks() {
     banksState = [...DEFAULT_BANKS];
     statsState = {};
-    if (typeof localStorage !== 'undefined') {
+    if (typeof localStorage !== 'undefined' && !isCloudState) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(banksState));
       localStorage.setItem(STATS_KEY, JSON.stringify(statsState));
     }

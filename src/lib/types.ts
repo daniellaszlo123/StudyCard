@@ -50,3 +50,4 @@ export interface QuestionStats {
 
 export type QuestionBankStats = Record<string, QuestionStats>;
 
+export type BankExamMode = 'random' | 'difficult' | 'least-solved';

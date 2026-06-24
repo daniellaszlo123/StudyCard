@@ -65,6 +65,7 @@
   "difficultyMode": "Exam Mode",
   "modeRandom": "Randomized Questions",
   "modeDifficult": "Focus on Difficult Questions",
+  "modeLeastSolved": "Focus on Least Solved Questions",
   "statsLabel": "Accuracy: {pct}% ({correct}/{attempts})",
   "noStats": "No attempts yet",
   "examScore": "Exam Score",

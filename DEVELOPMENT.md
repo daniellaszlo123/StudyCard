@@ -95,7 +95,8 @@ In `BankExam.svelte`, the user can configure a multiple-choice session.
 - **Difficulty Rating:** Each question's error rate is tracked dynamically:
   $$\text{Difficulty Score} = \frac{\text{wrongCount}}{\text{correctCount} + \text{wrongCount}}$$
 - **Difficult Exam Selection:** In "Focus on Difficult Questions" mode, questions that have been answered incorrectly at least once (`wrongCount > 0`) are sorted descending by difficulty score and total wrong count.
-- **Adaptive Backfilling:** If the bank contains fewer than $N$ questions with recorded mistakes, the exam is backfilled to the requested count of $N$ using remaining randomized questions from the bank.
+- **Least Solved Selection:** In "Focus on Least Solved Questions" mode, questions are sorted ascending by the total number of times they have been solved/attempted ($\text{attempts} = \text{correctCount} + \text{wrongCount}$). Questions that have never been attempted are treated as having 0 attempts. Ties are randomized to ensure variety.
+- **Adaptive Backfilling:** If the bank contains fewer than $N$ questions with recorded mistakes (in Difficult mode), the exam is backfilled to the requested count of $N$ using remaining randomized questions from the bank.
 - **Visual Feedback:** Options change colors instantly upon clicking (green for correct, red for incorrect along with highlighting the correct one), accompanied by a slide-by-slide progress counter and a full review list of mistakes at the end of the session. To improve usability in long exams, action buttons (Exit Exam, Restart Exam) are duplicated at both the top and bottom of the results screen.
 - **Shuffle Possible Answers:** Users can toggle "Shuffle answer options" during exam setup. When enabled, the possible answers (choices) for each question are randomized per exam session. This is handled by cloning the question objects and shuffling their `choices` arrays dynamically in the exam player component, ensuring the original database/store records in `localStorage` remain intact and correctness comparison (which matches option strings) works seamlessly.
 
@@ -142,9 +143,12 @@ create policy "Users can manage their own data"
 ```
 
 ### 4. Sync Operations
-- **Clean Sync**: Automatically triggered upon successful login. Instead of merging default dummy decks into the user's account, it pulls the user's remote cloud card decks, question banks, and progress records directly, completely overwriting local storage. If no cloud data exists (e.g. for a new user), it initializes the cloud storage and local workspace with empty arrays. This ensures strict isolation between accounts and local defaults.
-- **Auto-Sync**: Always active. Local modifications (adding/editing cards, question attempts, statistics updates) automatically trigger an upsert of the local state to the cloud database in the background.
-- **Log Out**: Resets local state to generic default cards and question banks to ensure user privacy and guest usability, with zero personal data persistent.
+- **Registration/Login Merge**: When a user registers (signs up) or logs in, their current local guest data (decks, banks, progress statistics) is automatically merged with any existing remote data on Supabase.
+  - Decks and banks are merged by ID, and duplicate cards/questions within matching IDs are filtered out.
+  - Statistics (correct and wrong counts) for matching question IDs are added together.
+  - After a successful merge and push to the Supabase database, local storage keys (`studycard_decks`, `studycard_banks`, `studycard_bank_stats`) are permanently cleared.
+- **Auto-Sync / Auth State**: While a user is authenticated, the application operates in "cloud mode," where all additions, edits, and stats are saved directly to Supabase rather than `localStorage`.
+- **Log Out**: Resets local state flags to non-cloud mode and populates local storage with the default sample decks and banks, ensuring guest usability with privacy.
 
 ---
 

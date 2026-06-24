@@ -50,9 +50,10 @@ function loadDecks(): Deck[] {
 }
 
 let changeListener: (() => void) | null = null;
+let isCloudState = $state(false);
 
 function saveDecks(data: Deck[]) {
-  if (typeof localStorage !== 'undefined') {
+  if (typeof localStorage !== 'undefined' && !isCloudState) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
   if (changeListener) changeListener();
@@ -62,6 +63,13 @@ function saveDecks(data: Deck[]) {
 let decksState = $state<Deck[]>(loadDecks());
 
 export const deckStore = {
+  get isCloud() {
+    return isCloudState;
+  },
+  set isCloud(value: boolean) {
+    isCloudState = value;
+  },
+
   get decks() {
     return decksState;
   },

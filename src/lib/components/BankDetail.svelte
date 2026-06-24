@@ -2,14 +2,14 @@
   import { i18n } from '../i18n.svelte';
   import { bankStore } from '../bankStorage.svelte';
   import { toastStore } from '../toast.svelte';
-  import type { Question } from '../types';
+  import type { Question, BankExamMode } from '../types';
   import { formatCardText } from '../utils';
 
   // Props
   let { bankId, onGoBack, onStartExam } = $props<{
     bankId: string;
     onGoBack: () => void;
-    onStartExam: (count: number, mode: 'random' | 'difficult', shuffleAnswers: boolean) => void;
+    onStartExam: (count: number, mode: BankExamMode, shuffleAnswers: boolean) => void;
   }>();
 
   // Find current bank reactively
@@ -150,7 +150,7 @@
 
   // Exam Setup Options
   let examSize = $state(bank ? Math.min(10, bank.questions.length) : 5);
-  let examMode = $state<'random' | 'difficult'>('random');
+  let examMode = $state<BankExamMode>('random');
   let shuffleAnswers = $state(false);
 
   // Clamp exam size dynamically if questions length changes
@@ -263,6 +263,7 @@
               <option value="difficult" disabled={!hasDifficultQuestions()}>
                 {i18n.t('modeDifficult')} {!hasDifficultQuestions() ? '🔒' : ''}
               </option>
+              <option value="least-solved">{i18n.t('modeLeastSolved')}</option>
             </select>
           </div>
 

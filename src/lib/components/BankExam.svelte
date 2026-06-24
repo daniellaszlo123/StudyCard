@@ -1,14 +1,14 @@
 <script lang="ts">
   import { i18n } from '../i18n.svelte';
   import { bankStore } from '../bankStorage.svelte';
-  import type { Question } from '../types';
+  import type { Question, BankExamMode } from '../types';
   import { formatCardText } from '../utils';
 
   // Props
   let { bankId, count, mode, shuffleAnswers, onGoBack } = $props<{
     bankId: string;
     count: number;
-    mode: 'random' | 'difficult';
+    mode: BankExamMode;
     shuffleAnswers: boolean;
     onGoBack: () => void;
   }>();
@@ -77,6 +77,26 @@
       }
 
       chosenQuestions = selected;
+    } else if (mode === 'least-solved') {
+      // Get all questions mapped with stats
+      const qWithStats = bank.questions.map(q => {
+        const stats = bankStore.getQuestionStats(q.id);
+        const solvedCount = stats.correctCount + stats.wrongCount;
+        return { q, solvedCount };
+      });
+
+      // First, shuffle the questions to randomize ties (e.g. multiple questions with 0 or 1 attempt)
+      const shuffledQWithStats = [...qWithStats];
+      for (let i = shuffledQWithStats.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledQWithStats[i], shuffledQWithStats[j]] = [shuffledQWithStats[j], shuffledQWithStats[i]];
+      }
+
+      // Sort by solvedCount ascending
+      shuffledQWithStats.sort((a, b) => a.solvedCount - b.solvedCount);
+
+      // Take the top limit
+      chosenQuestions = shuffledQWithStats.slice(0, limit).map(item => item.q);
     } else {
       // Standard random exam mode: Shuffle all questions
       const shuffled = [...bank.questions];
