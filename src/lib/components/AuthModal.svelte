@@ -37,6 +37,7 @@
         if (res.error) {
           errorMessage = res.error;
         } else {
+          await supabaseService.pull();
           toastStore.show(i18n.t('syncSuccess'), 'success');
           onClose();
         }
@@ -54,6 +55,7 @@
           if (loginRes.error) {
             errorMessage = loginRes.error;
           } else {
+            await supabaseService.pull();
             toastStore.show(i18n.t('syncSuccess'), 'success');
             onClose();
           }
@@ -75,17 +77,7 @@
     await supabaseService.merge();
   }
 
-  async function handlePull() {
-    if (confirm(i18n.t('importError') + '? ' + i18n.t('resetStats') + '?')) { // fallback warn
-      await supabaseService.pull();
-    }
-  }
 
-  async function handlePush() {
-    if (confirm(i18n.t('save') + '? Overwrite cloud data?')) {
-      await supabaseService.push();
-    }
-  }
 </script>
 
 <svelte:window onkeydown={handleKeyDown} />
@@ -143,30 +135,7 @@
             </button>
           </div>
 
-          <!-- Advanced Manual Overrides -->
-          <details class="advanced-overrides">
-            <summary style="font-size: 13px; color: var(--text-muted); cursor: pointer; margin-bottom: 8px;">
-              ⚙️ Advanced Overrides
-            </summary>
-            <div style="display: flex; gap: 12px; margin-top: 8px;">
-              <button 
-                class="btn btn-secondary" 
-                style="flex: 1; font-size: 12px; padding: 8px;" 
-                onclick={handlePull}
-                disabled={supabaseService.syncLoading}
-              >
-                ⬇️ Pull (Cloud ➔ Local)
-              </button>
-              <button 
-                class="btn btn-secondary" 
-                style="flex: 1; font-size: 12px; padding: 8px;" 
-                onclick={handlePush}
-                disabled={supabaseService.syncLoading}
-              >
-                ⬆️ Push (Local ➔ Cloud)
-              </button>
-            </div>
-          </details>
+
 
           <!-- Logout Button -->
           <button class="btn btn-danger" style="width: 100%; margin-top: 24px;" onclick={handleLogout}>

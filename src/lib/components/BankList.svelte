@@ -3,6 +3,7 @@
   import { i18n } from '../i18n.svelte';
   import { bankStore } from '../bankStorage.svelte';
   import { toastStore } from '../toast.svelte';
+  import { supabaseService } from '../supabase.svelte';
 
   // Props
   let { onSelectBank } = $props<{
@@ -39,7 +40,7 @@
         skipEmptyLines: true,
         delimiter: isTxt ? ';' : '',
         quoteChar: '',
-        complete: (results) => {
+        complete: async (results) => {
           const rows = results.data as string[][];
           if (rows.length === 0) {
             toastStore.show(i18n.t('importError'), 'error');

@@ -3,6 +3,7 @@
   import { i18n } from '../i18n.svelte';
   import { deckStore } from '../storage.svelte';
   import { toastStore } from '../toast.svelte';
+  import { supabaseService } from '../supabase.svelte';
 
   // Props
   let { onSelectDeck } = $props<{
@@ -39,7 +40,7 @@
         skipEmptyLines: true,
         delimiter: isTxt ? ';' : '',
         quoteChar: '',
-        complete: (results) => {
+        complete: async (results) => {
           const rows = results.data as string[][];
           if (rows.length === 0) {
             toastStore.show(i18n.t('importError'), 'error');
@@ -85,6 +86,8 @@
           // Set deck name to the file name (without extension)
           const deckName = file.name.replace(/\.[^/.]+$/, "");
           const deck = deckStore.createDeck(deckName, cards);
+          
+          await supabaseService.push();
           toastStore.show(i18n.t('importSuccess') + ` (${cards.length} ${i18n.t('cardsCount')})`, 'success');
           
           // Reset file input
